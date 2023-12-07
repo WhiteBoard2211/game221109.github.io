@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      cursor: crosshair; /* Mengubah kursor menjadi crosshair di seluruh halaman */
+    }
+
+    #game-container {
+      position: relative;
+    }
+
+    .ball {
+      width: 10px; /* Ukuran bola yang lebih kecil */
+      height: 10px; /* Ukuran bola yang lebih kecil */
+      background-color: #db3434;
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    #score {
+      position: absolute;
+      top: -360px;
+      right: 565px;
+      font-size: 24px;
+    }
+
+    #timer {
+      position: absolute;
+      bottom: 240px;
+      right: 565px;
+      font-size: 18px;
+    }
+
+    #settings {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+  </style>
+  <title>Click Bola Game</title>
+</head>
+<body>
+  <div id="game-container">
+    <div id="score">Score: <span id="score-value">0</span></div>
+    <div id="timer">Time: <span id="timer-value">30</span> seconds</div>
+  </div>
+
+  <div id="settings">
+    Set Timer: <input type="number" id="timer-input" value="30"> seconds
+    <button onclick="updateTimerSetting()">Apply</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const gameContainer = document.getElementById('game-container');
+      const scoreElement = document.getElementById('score-value');
+      const timerElement = document.getElementById('timer-value');
+      const timerInput = document.getElementById('timer-input');
+
+      let score = 0;
+      let timer = 30;
+      let ball;
+      let timerInterval;
+
+      function getRandomPosition() {
+        const containerRect = gameContainer.getBoundingClientRect();
+        const maxX = containerRect.width - 30; // Lebar bola
+        const maxY = containerRect.height - 30; // Tinggi bola
+        const x = Math.random() * (maxX - 30) + 30; // Jarak bola lebih jauh
+        const y = Math.random() * (maxY - 30) + 30; // Jarak bola lebih jauh
+        return { x, y };
+      }
+
+      function createBall() {
+        if (ball) {
+          gameContainer.removeChild(ball);
+        }
+
+        ball = document.createElement('div');
+        ball.className = 'ball';
+        const position = getRandomPosition();
+        ball.style.left = `${position.x}px`;
+        ball.style.top = `${position.y}px`;
+        ball.addEventListener('click', handleBallClick);
+        gameContainer.appendChild(ball);
+      }
+
+      function handleBallClick() {
+        score++;
+        scoreElement.textContent = score;
+        createBall();
+      }
+
+      function updateTimerSetting() {
+        timer = parseInt(timerInput.value);
+        timerElement.textContent = timer;
+        resetGame();
+      }
+
+      function updateTimer() {
+        if (timer > 0) {
+          timer--;
+          timerElement.textContent = timer;
+        } else {
+          endGame();
+        }
+      }
+
+      function endGame() {
+        alert(`Game Over! Your final score is ${score}.`);
+        resetGame();
+      }
+
+      function resetGame() {
+        clearInterval(timerInterval);
+        score = 0;
+        scoreElement.textContent = score;
+
+        // Perbarui nilai timer dari input
+        timer = parseInt(timerInput.value);
+        timerElement.textContent = timer;
+
+        createBall();
+        timerInterval = setInterval(updateTimer, 1000);
+      }
+
+      resetGame();
+    });
+  </script>
+</body>
+</html>
